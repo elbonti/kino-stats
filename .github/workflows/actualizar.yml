@@ -1,0 +1,35 @@
+name: Actualizar Dashboard Kino
+
+on:
+  schedule:
+    # Ejecutar todos los días a las 12:00 PM UTC (9:00 AM hora Chile)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Permite ejecución manual
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar Scraper y Analizador
+        run: |
+          python scripts/scraper.py
+          python scripts/analyzer.py
+
+      - name: Commit y Push de los nuevos datos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: actualizar datos del dashboard"
+          git push
