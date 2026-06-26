@@ -6,6 +6,10 @@ on:
     - cron: '0 12 * * *'
   workflow_dispatch: # Permite ejecución manual
 
+permissions:
+  contents: write
+  pull-requests: write # Include this if creating or modifying PRs
+  
 jobs:
   update:
     runs-on: ubuntu-latest
