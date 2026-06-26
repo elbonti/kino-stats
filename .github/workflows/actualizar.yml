@@ -1,20 +1,19 @@
-name: Actualizar Dashboard Kino
+name: Actualizar datos del Kino
 
 on:
   schedule:
-    # Ejecutar todos los días a las 12:00 PM UTC (9:00 AM hora Chile)
-    - cron: '0 12 * * *'
-  workflow_dispatch: # Permite ejecución manual
+    - cron: '0 23 * * *' # Se ejecuta todos los días (ejemplo)
+  workflow_dispatch: # Te permite ejecutarlo manualmente con un botón
 
+# ¡ESTA LÍNEA ES CLAVE! Le dice a GitHub que este script puede modificar archivos
 permissions:
-  contents: write
-  pull-requests: write # Include this if creating or modifying PRs
-  
+  contents: write 
+
 jobs:
-  update:
+  actualizar-dashboard:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
+      - name: Clonar repositorio
         uses: actions/checkout@v4
 
       - name: Configurar Python
@@ -22,18 +21,18 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Instalar dependencias
-        run: pip install -r requirements.txt
+      # ... Aquí van tus pasos para instalar librerías y correr tu script de Python ...
+      # Ejemplo:
+      # - name: Instalar dependencias
+      #   run: pip install requests pandas
+      # - name: Ejecutar script de loteria.cl
+      #   run: python mi_script.py
 
-      - name: Ejecutar Scraper y Analizador
+           - name: Guardar y subir cambios con PAT
         run: |
-          python scripts/scraper.py
-          python scripts/analyzer.py
-
-      - name: Commit y Push de los nuevos datos
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: actualizar datos del dashboard"
-          git push
+          git config --global user.name "elbonti" # Pon aquí tu usuario real de GitHub
+          git config --global user.email "tu_correo_real@ejemplo.com"
+          git add .
+          git commit -m "chore: actualizar datos del dashboard" || echo "No hay cambios que subir"
+          # Fíjate cómo usamos el secreto en la URL del push:
+          git push https://elbonti:${{ secrets.PAT_TOKEN }}@github.com/elbonti/kino-stats.git main
